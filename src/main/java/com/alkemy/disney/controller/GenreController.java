@@ -35,4 +35,11 @@ public class GenreController {
         genreService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping("{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id){
+
+        GenreDTO dto = genreService.getById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
 }

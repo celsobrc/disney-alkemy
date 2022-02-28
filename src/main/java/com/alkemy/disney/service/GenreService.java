@@ -8,6 +8,6 @@ public interface GenreService {
 
     public GenreDTO save(GenreDTO dto);
     public List<GenreDTO> getAll();
-
     public void delete(Long id);
+    GenreDTO getById(Long id);
 }
