@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -14,9 +15,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "film")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-public class FilmEntity extends BaseEntity{
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SQLDelete(sql = "UPDATE film SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
+public class FilmEntity extends BaseEntity {
 
     private String title;
 
@@ -28,22 +33,29 @@ public class FilmEntity extends BaseEntity{
 
     private Integer rating;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE}
+    )
     @JoinColumn(name = "genre_id", insertable = false, updatable = false)
     private GenreEntity genre;
 
     @Column(name = "genre_id", nullable = false)
     private Long genreId;
 
-    @ManyToMany(
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
+    @ManyToMany
+            (
+                    cascade = {
+                            CascadeType.PERSIST,
+                            CascadeType.MERGE
+                    })
     @JoinTable(
             name = "film_character",
             joinColumns = @JoinColumn(name = "film_id"),
             inverseJoinColumns = @JoinColumn(name = "character_id"))
-    private List<CharacterEntity> characters = new ArrayList<>();
+    private List<PersonajeEntity> characters = new ArrayList<>();
+
+    private boolean deleted = Boolean.FALSE;
 
 }
